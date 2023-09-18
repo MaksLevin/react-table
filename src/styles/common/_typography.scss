@@ -1,0 +1,45 @@
+@import "variables";
+
+.text-h1 {
+  font-family: $font-family;
+  font-size: 27px;
+  font-weight: bold;
+  line-height: 32px;
+
+  letter-spacing: 0.2px;
+}
+
+.text-h2 {
+  font-family: $font-family;
+  font-size: 22px;
+  font-weight: bold;
+  line-height: 24px;
+
+  letter-spacing: 0.15px;
+}
+
+.text-h3 {
+  font-family: $font-family;
+  font-size: 19px;
+  font-weight: bold;
+  line-height: 24px;
+
+  letter-spacing: 0.15px;
+}
+
+.text-body-medium {
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.text-body-small {
+  font-size: 13px;
+  line-height: 16px;
+
+  letter-spacing: 0;
+}
+
+.text-body-medium-primary {
+  @extend .text-body-medium;
+  color: $color-primary;
+}
