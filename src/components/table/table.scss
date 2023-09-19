@@ -1,0 +1,32 @@
+@import "../../styles/common/variables";
+@import "../../styles/common/typography";
+
+.table {
+    display: grid;
+    grid-template-columns: minmax(150px, 1.33fr) minmax(150px, 1.33fr) minmax(150px, 1.33fr) minmax(150px, 1.33fr);
+    margin-top: 10px;
+
+    &-head {
+        display: contents;
+    }
+
+    &-body {
+        display: contents;
+    }
+
+    &-head-row {
+        display: contents;
+    }
+
+    &-head-title {
+        padding: 10px 0;
+        color: $color-primary;
+        border-top: 1px solid $color-secondary;
+        border-bottom: 1px solid $color-secondary;
+        margin: -1px 0;
+
+        &:not(:last-child) {
+            border-right: 1px solid $color-secondary;
+        }
+    }
+}

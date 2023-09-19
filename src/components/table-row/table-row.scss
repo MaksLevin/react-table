@@ -1,0 +1,19 @@
+@import "../../styles/common/variables";
+@import "../../styles/common/typography";
+
+.table {
+    &-row {
+        display: contents;
+    }
+
+    &-cell {
+        padding: 10px 0;
+        text-align: center;
+        border-top: 1px solid $color-secondary;
+        border-bottom: 1px solid $color-secondary;
+
+        &:not(:last-child) {
+            border-right: 1px solid $color-secondary;
+        }
+    }
+}

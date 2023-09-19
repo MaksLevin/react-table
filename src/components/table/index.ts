@@ -1,0 +1,1 @@
+export { MemoizedTable } from './table';
