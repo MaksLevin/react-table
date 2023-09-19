@@ -1,4 +1,4 @@
-import { TableData } from '../../models/table-data';
+import { TableData } from './table-data';
 import { FetchTableDataSuccess, SetTableDataSuccess } from './table.action';
 
 export function setTableDataSuccess(value: TableData) {

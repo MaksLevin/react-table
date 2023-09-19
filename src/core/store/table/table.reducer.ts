@@ -1,4 +1,4 @@
-import { ReducerTableData } from '../../models/table-data';
+import { ReducerTableData } from './table-data';
 import { SetTableDataSuccess } from './table.action';
 
 export const initialState: ReducerTableData = {

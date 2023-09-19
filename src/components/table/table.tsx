@@ -1,14 +1,14 @@
-import React, { useEffect, memo } from 'react';
+import React, { useEffect, memo, FunctionComponent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { fetchTableDataSuccess } from '../../core/store/table/table.actionCreators';
 import { selectTableData } from '../../core/store/table/table.selectors';
-import { TableData } from '../../core/models/table-data';
+import { TableData } from '../../core/store/table/table-data';
 import { MemoizedTableRow } from '../table-row';
 
 import './table.scss';
 
-const Table = () => {
+const Table: FunctionComponent = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
