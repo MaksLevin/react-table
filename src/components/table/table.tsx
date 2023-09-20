@@ -20,7 +20,7 @@ const Table: FunctionComponent = () => {
   }, [dispatch]);
 
   const requestSort = useCallback(
-    (field: any) => {
+    (field: string) => {
       let direction = 'asc';
       if (sortConfig.field === field && sortConfig.direction === 'asc') {
         direction = 'desc';
