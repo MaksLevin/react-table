@@ -1,5 +1,5 @@
-import { ReducerTableData } from './table-data';
-import { SetTableDataSuccess } from './table.action';
+import { ReducerTableData } from './table-data.model';
+import { SetSortableTableDataSuccess, SetTableDataSuccess } from './table.action';
 
 export const initialState: ReducerTableData = {
   tableList: [],
@@ -8,6 +8,11 @@ export const initialState: ReducerTableData = {
 export function reducerTableData(state = initialState, action: any) {
   switch (action.type) {
     case SetTableDataSuccess:
+      return {
+        ...state,
+        tableList: action.value,
+      };
+    case SetSortableTableDataSuccess:
       return {
         ...state,
         tableList: action.value,

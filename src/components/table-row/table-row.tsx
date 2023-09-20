@@ -1,6 +1,6 @@
 import React, { FunctionComponent, memo } from 'react';
 
-import { TableData } from '../../core/store/table/table-data';
+import { TableData } from '../../core/store/table/table-data.model';
 
 import './table-row.scss';
 
