@@ -1,5 +1,10 @@
-import { TableData } from './table-data';
-import { FetchTableDataSuccess, SetTableDataSuccess } from './table.action';
+import { TableData } from './table-data.model';
+import {
+  FetchSortableTableDataSuccess,
+  FetchTableDataSuccess,
+  SetSortableTableDataSuccess,
+  SetTableDataSuccess,
+} from './table.action';
 
 export function setTableDataSuccess(value: TableData) {
   return {
@@ -11,5 +16,20 @@ export function setTableDataSuccess(value: TableData) {
 export function fetchTableDataSuccess() {
   return {
     type: FetchTableDataSuccess,
+  };
+}
+
+export function setSortableTableDataSuccess(value: TableData) {
+  return {
+    type: SetSortableTableDataSuccess,
+    value,
+  };
+}
+
+export function fetchSortableTableDataSuccess(field: string, direction: string): any {
+  return {
+    type: FetchSortableTableDataSuccess,
+    field,
+    direction,
   };
 }

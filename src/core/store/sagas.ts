@@ -1,6 +1,6 @@
 import { all } from '@redux-saga/core/effects';
-import { fetchTableDataWatcher } from './table/table.saga';
+import { fetchSortableTableDataWatcher, fetchTableDataWatcher } from './table/table.saga';
 
 export function* rootWatcher() {
-  yield all([fetchTableDataWatcher()]);
+  yield all([fetchTableDataWatcher(), fetchSortableTableDataWatcher()]);
 }
