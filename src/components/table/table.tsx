@@ -36,16 +36,7 @@ const Table: FunctionComponent = () => {
       );
     }
     if (searchTermLikes || searchTermStatus || searchTermDate) {
-      console.log('work');
       setTableData(
-        tableData.filter((item: TableData) => {
-          if (item.title.toLowerCase().includes(searchValue.toLowerCase())) {
-            return item;
-          }
-          return null;
-        })
-      );
-      console.log(
         tableData.filter((item: TableData) => {
           if (item.title.toLowerCase().includes(searchValue.toLowerCase())) {
             return item;
@@ -142,7 +133,6 @@ const Table: FunctionComponent = () => {
 
   useEffect(() => {
     dispatch(fetchTableDataSuccess());
-    console.log(tableData);
   }, [dispatch, tableData]);
 
   const requestSort = useCallback(
