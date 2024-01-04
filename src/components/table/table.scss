@@ -2,32 +2,57 @@
 @import "../../styles/common/typography";
 
 .table {
-    display: grid;
-    grid-template-columns: minmax(150px, 1.33fr) minmax(150px, 1.33fr) minmax(150px, 1.33fr) minmax(150px, 1.33fr);
-    margin-top: 10px;
+  display: grid;
+  grid-template-columns: minmax(150px, 1.33fr) minmax(150px, 1.33fr) minmax(150px, 1.33fr) minmax(150px, 1.33fr);
+  margin-top: 10px;
 
-    &-head {
-        display: contents;
+  &-head,
+  &-footer,
+  &-body,
+  &-head-row {
+      display: contents;
+  }
+
+  &-head-title {
+      padding: 10px 0;
+      color: $color-primary;
+      border-top: 1px solid $color-secondary;
+      border-bottom: 1px solid $color-secondary;
+      margin: -1px 0;
+      cursor: pointer;
+
+      &:not(:last-child) {
+          border-right: 1px solid $color-secondary;
+      }
+  }
+
+  &-footer {
+
+    &-row {
+      width: 400%;
+      background: #333;
+      color: #fff;
     }
 
-    &-body {
-        display: contents;
+    &-cell {
+      display: flex;
+      padding: 5px;
+    }
+    
+    &-pagination {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
     }
 
-    &-head-row {
-        display: contents;
+    &-paging {
+      display: flex;
+      gap: 10px;
     }
-
-    &-head-title {
-        padding: 10px 0;
-        color: $color-primary;
-        border-top: 1px solid $color-secondary;
-        border-bottom: 1px solid $color-secondary;
-        margin: -1px 0;
-        cursor: pointer;
-
-        &:not(:last-child) {
-            border-right: 1px solid $color-secondary;
-        }
+    
+    &-button {
+      cursor: pointer;
     }
+  }
+  
 }
