@@ -1,151 +1,115 @@
-import React, { useEffect, memo, FunctionComponent, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, memo, FunctionComponent } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+
+import { LoadingState, useDataTable } from '../../core/utils/use-table-data';
 import {
-  fetchSortableTableDataSuccess,
   fetchTableDataSuccess,
 } from '../../core/store/table/table.actionCreators';
 import { selectTableData } from '../../core/store/table/table.selectors';
 import { TableData } from '../../core/store/table/table-data.model';
+
 import { MemoizedTableRow } from '../table-row';
 
 import './table.scss';
-import { FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 
 const Table: FunctionComponent = () => {
   const dispatch = useDispatch();
 
   const { tableList } = useSelector(selectTableData);
-  const [sortConfig, setSortConfig] = useState({ field: '', direction: '' });
-  const [tableData, setTableData] = useState([]);
 
-  const [searchTermTitle, setSearchTermTitle] = useState('');
-  const [searchTermLikes, setSearchTermLikes] = useState('');
-  const [searchTermStatus, setSearchTermStatus] = useState('');
-  const [searchTermDate, setSearchTermDate] = useState('');
+  const [tableInfo, tableControl] = useDataTable<TableData>({ modificationTableData });
 
-  const searchTitle = (searchValue: string): void => {
-    if (!searchTermLikes && !searchTermStatus && !searchTermDate) {
-      setTableData(
-        tableList.filter((item: TableData) => {
-          if (item.title.toLowerCase().includes(searchValue.toLowerCase())) {
-            return item;
-          }
-          return null;
-        })
-      );
-    }
-    if (searchTermLikes || searchTermStatus || searchTermDate) {
-      setTableData(
-        tableData.filter((item: TableData) => {
-          if (item.title.toLowerCase().includes(searchValue.toLowerCase())) {
-            return item;
-          }
-          return null;
-        })
-      );
-    }
-  };
+  function updateFilter(key: keyof TableData, query: string) {
+    filterDelay(() => {
+      tableControl.filterBy({ ...(tableInfo.filter ?? {}), [key]: query });
+    });
+  }
 
-  const searchLikes = (searchValue: string): void => {
-    if (!searchTermTitle && !searchTermStatus && !searchTermDate) {
-      setTableData(
-        tableList.filter((item: TableData) => {
-          if (item.likes.toString().includes(searchValue)) {
-            return item;
-          }
-          return null;
-        })
+  function updateSorting(column: keyof TableData) {
+    if (tableInfo.sortBy === column) {
+      tableControl.sortBy(
+        column,
+        tableInfo.sortDirection === 'asc' ? 'desc' : 'asc'
       );
+    } else {
+      tableControl.sortBy(column, 'asc');
     }
-    if (searchTermTitle || searchTermStatus || searchTermDate) {
-      setTableData(
-        tableData.filter((item: TableData) => {
-          if (item.likes.toString().includes(searchValue)) {
-            return item;
-          }
-          return null;
-        })
-      );
-    }
-  };
+  }
 
-  const searchStatus = (searchValue: string): void => {
-    if (!searchTermTitle && !searchTermLikes && !searchTermDate) {
-      setTableData(
-        tableList.filter((item: TableData) => {
-          if (item.active.toString().includes(searchValue)) {
-            return item;
-          }
-          return null;
-        })
-      );
+  function getSortArrow(column: string) {
+    if (tableInfo.sortBy === column) {
+      return tableInfo.sortDirection === 'asc' ? '▲' : '▼';
+    } else {
+      return '';
     }
-    if (searchTermTitle || searchTermLikes || searchTermDate) {
-      setTableData(
-        tableData.filter((item: TableData) => {
-          if (item.active.toString().includes(searchValue)) {
-            return item;
-          }
-          return null;
-        })
-      );
-    }
-  };
+  }
 
-  const searchDate = (searchValue: string): void => {
-    if (!searchTermTitle && !searchTermLikes && !searchTermStatus) {
-      setTableData(
-        tableList.filter((item: TableData) => {
-          if (item.date.includes(searchValue)) {
-            return item;
-          }
-          return null;
-        })
-      );
-    }
-    if (searchTermTitle || searchTermLikes || searchTermStatus) {
-      setTableData(
-        tableData.filter((item: TableData) => {
-          if (item.date.includes(searchValue)) {
-            return item;
-          }
-          return null;
-        })
-      );
-    }
-  };
+  function modificationTableData(options: {
+    sortBy?: string;
+    sortDirection?: "asc" | "desc";
+    filter?: Partial<{ [key in keyof TableData]: string }>;
+    page: number;
+    pageSize: number;
+  }) {
+    let result = [...tableList];
 
-  const setFilter = useMemo(() => {
-    if (searchTermTitle) {
-      searchTitle(searchTermTitle);
+    if (options.filter) {
+      for (const key of Object.keys(options.filter)) {
+        const query = options.filter[key as keyof TableData] as string;
+        result = result.filter((entry) =>
+          entry[key as keyof TableData]
+            .toString().toLowerCase()
+            .includes(query.toLowerCase())
+        );
+      }
     }
-    if (searchTermLikes) {
-      searchLikes(searchTermLikes);
+
+    if (options.sortBy && options.sortDirection) {
+      result.sort((a, b) => {
+        const comparisonValue =
+          a[options.sortBy as keyof TableData] <
+          b[options.sortBy as keyof TableData]
+            ? 1
+            : -1;
+        return options.sortDirection === "asc"
+          ? comparisonValue
+          : -comparisonValue;
+      });
     }
-    if (searchTermStatus) {
-      searchStatus(searchTermStatus);
+
+    let pageIndex = options.page - 1;
+
+    if (pageIndex > result.length - 1) {
+      pageIndex = result.length - 1;
     }
-    if (searchTermDate) {
-      searchDate(searchTermDate);
+
+    const totalEntries = result.length;
+
+    result = result.splice(pageIndex * options.pageSize, options.pageSize);
+
+    return {
+      entries: result,
+      totalEntries,
+    };
+  }
+
+  let filterTimeout: number;
+  function filterDelay(cb: () => void) {
+    if (filterTimeout) {
+      clearTimeout(filterTimeout);
     }
-  }, [searchTermLikes, searchTermTitle, searchTermStatus, searchTermDate]);
+    filterTimeout = window.setTimeout(cb, 250);
+  }
 
   useEffect(() => {
     dispatch(fetchTableDataSuccess());
-  }, [dispatch, tableData]);
+  }, [dispatch]);
 
-  const requestSort = useCallback(
-    (field: string) => {
-      let direction = 'asc';
-      if (sortConfig.field === field && sortConfig.direction === 'asc') {
-        direction = 'desc';
-      }
-      setSortConfig({ field, direction });
-      dispatch(fetchSortableTableDataSuccess(field, direction));
-    },
-    [sortConfig, dispatch]
-  );
+  useEffect(() => {
+    tableControl.fetch();
+  }, [tableList]);
 
   return (
     <table className="table">
@@ -153,44 +117,35 @@ const Table: FunctionComponent = () => {
         <tr className="table-head-row">
           <th
             className="table-head-title text-h3"
-            onClick={() => {
-              requestSort('title');
-            }}
+            onClick={() => updateSorting('title')}
           >
-            Title
+            Title {getSortArrow('title')}
           </th>
           <th
             className="table-head-title text-h3"
-            onClick={() => {
-              requestSort('active');
-            }}
+            onClick={() => updateSorting('active')}
           >
-            Status
+            Status {getSortArrow('active')}
           </th>
           <th
             className="table-head-title text-h3"
-            onClick={() => {
-              requestSort('date');
-            }}
+            onClick={() => updateSorting('date')}
           >
-            Date
+            Date {getSortArrow('date')}
           </th>
           <th
             className="table-head-title text-h3"
-            onClick={() => {
-              requestSort('likes');
-            }}
+            onClick={() => updateSorting('likes')}
           >
-            Likes
+            Likes {getSortArrow('likes')}
           </th>
         </tr>
         <tr className="table-head-row">
           <th className="table-head-title text-h3">
             <TextField
               fullWidth
+              onChange={(event) => updateFilter('title', event.target.value)}
               placeholder="Search title..."
-              value={searchTermTitle}
-              onChange={(e) => setSearchTermTitle(e.target.value)}
             />
           </th>
           <th className="table-head-title text-h3">
@@ -198,9 +153,8 @@ const Table: FunctionComponent = () => {
               <InputLabel id="status-label">Status</InputLabel>
               <Select
                 labelId="status-label"
-                value={searchTermStatus}
                 label="Status"
-                onChange={(e) => setSearchTermStatus(e.target.value)}
+                onChange={(event) => updateFilter('active', event.target.value!.toString())}
               >
                 <MenuItem value="">All</MenuItem>
                 <MenuItem value="true">True</MenuItem>
@@ -211,50 +165,84 @@ const Table: FunctionComponent = () => {
           <th className="table-head-title text-h3">
             <TextField
               fullWidth
+              onChange={(event) => updateFilter('date', event.target.value)}
               placeholder="Date filter"
               type="number"
-              value={searchTermDate}
-              onChange={(e) => setSearchTermDate(e.target.value)}
             />
           </th>
           <th className="table-head-title text-h3">
             <TextField
               type="number"
+              onChange={(event) => updateFilter('likes', event.target.value)}
               fullWidth
               placeholder="Search likes..."
-              value={searchTermLikes}
-              onChange={(e) => setSearchTermLikes(e.target.value)}
             />
           </th>
         </tr>
       </thead>
       <tbody className="table-body">
-        {searchTermTitle || searchTermLikes || searchTermStatus || searchTermDate
-          ? tableData.map((item: TableData) => {
-              return [
-                <MemoizedTableRow
-                  key={`main-${item.id}`}
-                  id={item.id}
-                  title={item.title}
-                  active={item.active ? 'true' : 'false'}
-                  date={item.date}
-                  likes={item.likes}
-                />,
-              ];
-            })
-          : tableList.map((item: TableData) => {
-              return [
-                <MemoizedTableRow
-                  key={`main-${item.id}`}
-                  id={item.id}
-                  title={item.title}
-                  active={item.active ? 'true' : 'false'}
-                  date={item.date}
-                  likes={item.likes}
-                />,
-              ];
-            })}
+      {tableInfo.state === LoadingState.Loading ? (
+          /** Loading Indicator */
+          <tr>
+            <td>
+              Loading ...
+            </td>
+          </tr>
+        ) : (
+          /** Table Rows */
+          tableInfo.entries.map((item: TableData) => (
+            <MemoizedTableRow
+              key={`main-${item.id}`}
+              id={item.id}
+              title={item.title}
+              active={item.active ? 'true' : 'false'}
+              date={item.date}
+              likes={item.likes}
+             />
+          ))
+        )}
       </tbody>
+      {/** Paginator */}
+      <tfoot className="table-footer">
+        <tr className="table-footer-row">     
+          <td className="table-footer-cell">
+            <div className="table-footer-pagination">
+              <div className="table-footer-total-entries">
+                Total Entries: {tableInfo.totalEntries}
+              </div>
+              <div className="table-footer-paging">
+                <div>
+                  Items per page:
+                  <select
+                    onChange={(event) =>
+                      tableControl.setPageSize(parseInt(event.target.value))
+                    }
+                  >
+                    <option value={10}>10</option>
+                    <option value={25}>25</option>
+                    <option value={50}>50</option>
+                  </select>
+                </div>
+                <div
+                  className="table-footer-button"
+                  onClick={() => tableControl.previousPage()}
+                >
+                  &lt;
+                </div>
+                {`Page ${tableInfo.page} of ${Math.ceil(
+                  tableInfo.totalEntries / tableInfo.pageSize
+                )}`}
+                <div
+                  className="table-footer-button"
+                  onClick={() => tableControl.nextPage()}
+                >
+                  &gt;
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tfoot>
     </table>
   );
 };
