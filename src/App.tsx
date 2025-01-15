@@ -1,7 +1,7 @@
 import React from 'react';
 
 import './App.scss';
-import { MemoizedTable } from './components/table';
+import { MemoizedTable } from '@components/table';
 
 function App() {
   return <MemoizedTable />;
