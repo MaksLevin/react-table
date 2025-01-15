@@ -3,14 +3,16 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 
-import { LoadingState, useDataTable } from '../../core/utils/use-table-data';
+import { LoadingState } from '@core/types/use-table-data.model';
+import { useDataTable } from '@core/utils/use-table-data';
 import {
   fetchTableDataSuccess,
-} from '../../core/store/table/table.actionCreators';
-import { selectTableData } from '../../core/store/table/table.selectors';
-import { TableData } from '../../core/store/table/table-data.model';
+} from '@core/store/table/table.actionCreators';
+import { selectTableData } from '@core/store/table/table.selectors';
+import { TableData } from '@core/store/table/table-data.model';
 
-import { MemoizedTableRow } from '../table-row';
+
+import { MemoizedTableRow } from '@components/table-row/table-row';
 
 import './table.scss';
 
