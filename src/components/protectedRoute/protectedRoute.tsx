@@ -5,5 +5,5 @@ import { selectAuth } from '@core/store/auth/auth.selectors';
 
 export const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
     const { user } = useSelector(selectAuth);
-  return user ? children : <Navigate to="/login" />;
+    return user ? children : <Navigate to="/login" />;
 };
